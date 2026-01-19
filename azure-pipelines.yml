@@ -28,13 +28,13 @@ stages:
           $(tag)
 
     # 2️⃣ Remove old container if exists
-    - task: PowerShell@2
-      displayName: Remove old container
-      inputs:
-        targetType: inline
-        script: |
-          docker rm -f $(containerName) 2>$null
-          echo "Old container removed (if existed)"
+    # - task: PowerShell@2
+    #   displayName: Remove old container
+    #   inputs:
+    #     targetType: inline
+    #     script: |
+    #       docker rm -f $(containerName) 2>$null
+    #       echo "Old container removed (if existed)"
 
     # 3️⃣ Run container from image (DEPLOY)
     - task: PowerShell@2
