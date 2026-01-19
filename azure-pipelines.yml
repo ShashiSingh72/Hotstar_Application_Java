@@ -5,8 +5,9 @@ resources:
 
 variables:
   imageName: java-app
-  tag: latest
   containerName: java-app-container
+  tag: '$(Date:yyyyMMdd)-$(Date:HHmmss)'
+
 
 stages:
 - stage: BuildAndDeploy
@@ -17,7 +18,7 @@ stages:
     pool: TodoAgent   # ✅ SELF-HOSTED AGENT
 
     steps:
-    # 1️⃣ Build Docker Image
+    # 1 Build Docker Image
     - task: Docker@2
       displayName: Build Docker Image
       inputs:
@@ -27,16 +28,7 @@ stages:
         tags: |
           $(tag)
 
-    # 2️⃣ Remove old container if exists
-    # - task: PowerShell@2
-    #   displayName: Remove old container
-    #   inputs:
-    #     targetType: inline
-    #     script: |
-    #       docker rm -f $(containerName) 2>$null
-    #       echo "Old container removed (if existed)"
-
-    # 3️⃣ Run container from image (DEPLOY)
+    # 2 Run container from image (DEPLOY)
     - task: PowerShell@2
       displayName: Run Docker Container
       inputs:
