@@ -23,11 +23,16 @@ stages:
       displayName: Build an image
       inputs:
         command: build
-        imageName: java-app:latest
+        repository: java-app:latest
         dockerfile: '$(Build.SourcesDirectory)/Dockerfile'
         tags: |
           $(tag)
+
     - task: PowerShell@2
       inputs:
         targetType: 'inline'
-        script: 'docker run -d --name java-app-container -p 8080:8081 java-app:latest'
+        script: 'docker rm -f'
+    - task: PowerShell@2
+      inputs:
+        targetType: 'inline'
+        script: 'docker run -d --name java-app-container -p 8080:8080 java-app:latest'
