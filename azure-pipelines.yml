@@ -44,5 +44,5 @@ stages:
         script: |
           docker run -d `
             --name $(containerName) `
-            -p 8080:8081 `
+            -p 7000:8080 `
             $(imageName):$(tag)
