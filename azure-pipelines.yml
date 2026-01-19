@@ -1,31 +1,48 @@
-# Docker
-# Build a Docker image
-# https://docs.microsoft.com/azure/devops/pipelines/languages/docker
-
-trigger:
-- main
+trigger: none
 
 resources:
 - repo: self
 
 variables:
-  tag: '$(Build.BuildId)'
+  imageName: java-app
+  tag: latest
+  containerName: java-app-container
 
 stages:
-- stage: Build
-  displayName: Build image
+- stage: BuildAndDeploy
+  displayName: Build Image and Deploy Container
   jobs:
-  - job: Build
-    displayName: Build
-    pool:
-      vmImage: ubuntu-latest
+  - job: BuildDeploy
+    displayName: Build & Run Docker Container
+    pool: TodoAgent   # ✅ SELF-HOSTED AGENT
+
     steps:
+    # 1️⃣ Build Docker Image
     - task: Docker@2
-      displayName: Build an image
+      displayName: Build Docker Image
       inputs:
         command: build
-        dockerfile: '$(Build.SourcesDirectory)/Dockerfile'
+        repository: $(imageName)                 # ❗ sirf image name
+        dockerfile: $(Build.SourcesDirectory)/Dockerfile
         tags: |
           $(tag)
 
-          
+    # 2️⃣ Remove old container if exists
+    - task: PowerShell@2
+      displayName: Remove old container
+      inputs:
+        targetType: inline
+        script: |
+          docker rm -f $(containerName) 2>$null
+          echo "Old container removed (if existed)"
+
+    # 3️⃣ Run container from image (DEPLOY)
+    - task: PowerShell@2
+      displayName: Run Docker Container
+      inputs:
+        targetType: inline
+        script: |
+          docker run -d `
+            --name $(containerName) `
+            -p 8080:8080 `
+            $(imageName):$(tag)
